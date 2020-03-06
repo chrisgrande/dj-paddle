@@ -220,7 +220,11 @@ if settings.DJPADDLE_LINK_STALE_SUBSCRIPTIONS:
         sender, instance, created, *args, **kwargs
     ):
         if created:
+            link_field = settings.DJPADDLE_LINK_FIELD
+            subscriber_link_field = settings.DJPADDLE_SUBSCRIBER_LINK_FIELD
+            field_filter = {
+                link_field + '__iexact': getattr(instance, subscriber_link_field)}
             subscriptions = Subscription.objects.filter(
-                subscriber=None, email__iexact=instance.email
+                subscriber=None, **field_filter
             )
             subscriptions.update(subscriber=instance)

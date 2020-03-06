@@ -23,6 +23,14 @@ DJPADDLE_SUBSCRIBER_MODEL = getattr(
     settings, "DJPADDLE_SUBSCRIBER_MODEL", settings.AUTH_USER_MODEL
 )
 
+DJPADDLE_SUBSCRIBER_LINK_FIELD = getattr(
+    settings, "DJPADDLE_SUBSCRIBER_LINK_FIELD", 'email'
+)
+
+DJPADDLE_LINK_FIELD = getattr(
+    settings, "DJPADDLE_LINK_FIELD", 'email'
+)
+
 DJPADDLE_LINK_STALE_SUBSCRIPTIONS = getattr(
     settings, "DJPADDLE_LINK_STALE_SUBSCRIPTIONS", True
 )
@@ -37,6 +45,7 @@ def get_subscriber_model():
     Returns the subscriber model that is active in this project.
     """
     model_name = DJPADDLE_SUBSCRIBER_MODEL
+    model_link_field = DJPADDLE_SUBSCRIBER_LINK_FIELD
 
     # Attempt a Django 1.7 app lookup
     try:
@@ -52,10 +61,10 @@ def get_subscriber_model():
         )
 
     if (
-        "email" not in [field_.name for field_ in subscriber_model._meta.get_fields()]
-    ) and not hasattr(subscriber_model, "email"):
+        model_link_field not in [field_.name for field_ in subscriber_model._meta.get_fields()]
+    ) and not hasattr(subscriber_model, model_link_field):
         raise ImproperlyConfigured(
-            "DJPADDLE_SUBSCRIBER_MODEL must have an email attribute."
+            "DJPADDLE_SUBSCRIBER_MODEL must have a {field} attribute.".format(field=model_link_field)
         )
 
     return subscriber_model
